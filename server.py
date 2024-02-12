@@ -125,6 +125,9 @@ def dashboard():
 
     if user == None:
         return redirect(url_for('login'))
+    
+    if user.user.user_metadata['admin'] == True:
+        return redirect(url_for('admin_dashboard'))
 
     curr_user = {
         "id":user.user.id,
@@ -202,7 +205,25 @@ def admin_dashboard():
         user_list.append(User(c_user['id'], c_user['username'], c_user['email'], c_user['isSubscribed']))
 
     return render_template("admin/dashboard.html", user=curr_user, data=user_list)
+
+@app.route("/admin/user_profile/<id>")
+def admin_user_profile(id):
+    user = supabase.auth.get_user()
+
+    if (user == None or user.user.user_metadata["admin"] == False):
+        return redirect(url_for('login'))
     
+    data, count = supabase.table('user').select('*').eq('id', id).execute()
+
+    curr_user = data[1][0]
+
+    data, count = supabase.table('uploadedfiles').select('*').eq('userid', curr_user['id']).execute()
+    files = []
+    for items in data[1]:
+        files.append([items['id'], items['filename']])
+    
+    return render_template("admin/user_profile.html", user=curr_user, files=files)
+
 '''
 IN PROGRESS [stripe implementation]
 
@@ -279,10 +300,13 @@ def delete(id):
     if supabase.auth.get_user() == None:
         return redirect(url_for('login'))
     
-    data = supabase.table('uploadedfiles').select('filename').eq('id', id).execute()
-    res = data.json()
+    data, count = supabase.table('uploadedfiles').select('filename').eq('id', id).execute()
 
-    return res
+
+    supabase.table('uploadedfiles').delete().eq('id', id).execute()
+    supabase.storage.from_('gpxfiles').remove(data[1][0]['filename'])
+
+    return redirect(url_for('dashboard'))
 
 @app.route("/api/upload", methods=["POST"])
 def fileupload():

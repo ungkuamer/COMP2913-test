@@ -1,11 +1,17 @@
+
+## Features
 [] figure out how to attach metadata to stripe payment details
     - custom form
     - stripe payment link
 
-[] display gpx to map
-    - store points as rows in database when file is uploaded - parse using gpxpy
-    - pass points to js function
+## Design
+[] change user/file table to pages if too long
+    - limit database query to 'x' and change to the next 'x'
+      if button is clicked
 
-[] add docstring
-[] table to view uploaded files
-    - add link to view map page
+## Code
+[] add docstring - IN PROGRESS
+[] refactor code
+
+## Backend
+[] each user uploads to their own folder

@@ -27,7 +27,7 @@
                 </tr>
                 {% for item in data %}
                     <tr>
-                        <td class="text-left border-b-2 border-black p-2">{{item.id[:4]}}...{{ item.id[-4:]}}</td>
+                        <td class="text-left border-b-2 border-black p-2 underline"><a href="{{ url_for('admin_user_profile', id=item.id) }}" class="hover:font-bold">{{item.id[:4]}}...{{ item.id[-4:]}}</a></td>
                         <td class="text-left border-b-2 border-black p-2">{{ item.username }}</td>
                         <td class="text-left border-b-2 border-black p-2">{{ item.email }}</td>
                         <td class="text-left border-b-2 border-black p-2">{{ item.subscribe }}</td>
@@ -35,8 +35,6 @@
                 {% endfor %}
             </table>
         </div>
-        
-           
     </div>    
 </div>
 

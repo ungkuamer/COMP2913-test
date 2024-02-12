@@ -6,9 +6,9 @@
 [/] Display GPS route on map
     [/] Add interactive map to page
     [/] Get coordinate array and pass to JS function
-[] Allow owner display user data
+[/] Allow owner display user data
     [/] Display registered user
-    [] Display uploaded files
+    [/] Display uploaded files - on view create user page
 [] Accept payment - ON HOLD
     [] Add user metadata to payment
     [] Change user 'isSubscribed' status
