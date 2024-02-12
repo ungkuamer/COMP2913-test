@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="flex-grow">
+    <div class="container flex flex-col items-center mx-auto py-10 max-w-5xl lg:max-w-4xl md:max-w-3xl sm:max-w-xl">
+        <h1 class="text-3xl font-bold"> Plans and Pricing </h1>
+        <div class="flex flex-col items-center pt-10 gap-2">
+            <form action="/checkout" method="POST">
+                <input type="hidden" name="prod_PWbg8HyAZl88ks" value="{{PRICE_LOOKUP_KEY}}">
+                <button id="checkout-and-portal-button" type="submit">Checkout</button>
+            </form>
+        </div>
+        
+    </div>
+</div>
+{% endblock content %}

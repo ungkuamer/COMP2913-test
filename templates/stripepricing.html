@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="flex-grow">
+    <div class="container flex flex-col items-center mx-auto py-10 max-w-5xl lg:max-w-4xl md:max-w-3xl sm:max-w-xl">
+        <h1 class="text-3xl font-bold"> Plans and Pricing </h1>
+        <div class="flex flex-row gap-4 pt-10">
+            <div class="border-4 border-black">
+                <script async
+                    src="https://js.stripe.com/v3/buy-button.js">
+                </script>
+              
+                <stripe-buy-button
+                    buy-button-id="buy_btn_1OiJ7eIcceGFCV5CDgaSU4be"
+                    publishable-key="pk_test_51OhYOQIcceGFCV5CbQ807r4tf6fLZTgcVZSCTg7OKdzl4VvFDcLiDAQB6lU8NcwhG87NIQaimTDClheq5qEwjiBk00wAur0ikT"
+                >
+                </stripe-buy-button>
+            </div>
+            <div class="border-4 border-black">
+                <script async
+                src="https://js.stripe.com/v3/buy-button.js">
+                </script>
+              
+                <stripe-buy-button
+                buy-button-id="buy_btn_1Ohab8IcceGFCV5CJcjG2zQX"
+                publishable-key="pk_test_51OhYOQIcceGFCV5CbQ807r4tf6fLZTgcVZSCTg7OKdzl4VvFDcLiDAQB6lU8NcwhG87NIQaimTDClheq5qEwjiBk00wAur0ikT"
+                >
+                </stripe-buy-button>
+            </div>
+            <div class="border-4 border-black">
+                <script async
+                src="https://js.stripe.com/v3/buy-button.js">
+                </script>
+
+                <stripe-buy-button
+                buy-button-id="buy_btn_1OhadWIcceGFCV5C3ZnBNumr"
+                publishable-key="pk_test_51OhYOQIcceGFCV5CbQ807r4tf6fLZTgcVZSCTg7OKdzl4VvFDcLiDAQB6lU8NcwhG87NIQaimTDClheq5qEwjiBk00wAur0ikT"
+                >
+                </stripe-buy-button>
+            </div>
+        </div>
+    
+    </div>
+
+</div>
+    
+{% endblock content %}
