@@ -300,13 +300,23 @@ def delete(id):
     if supabase.auth.get_user() == None:
         return redirect(url_for('login'))
     
-    data, count = supabase.table('uploadedfiles').select('filename').eq('id', id).execute()
-
+    data, count = supabase.table('uploadedfiles').select('filename', 'userid').eq('id', id).execute()
+    filename = data[1][0]['filename']
+    userid = data[1][0]['userid']
 
     supabase.table('uploadedfiles').delete().eq('id', id).execute()
-    supabase.storage.from_('gpxfiles').remove(data[1][0]['filename'])
+    supabase.storage.from_('gpxfiles').remove(f"{userid}/{filename}")
 
     return redirect(url_for('dashboard'))
+
+@app.route("/api/test/<id>")
+def test_delete(id):
+    if supabase.auth.get_user() == None:
+        return redirect(url_for('login'))
+    
+    data, count = supabase.table('uploadedfiles').select('filename', 'userid').eq('id', id).execute()
+
+    return str(data)
 
 @app.route("/api/upload", methods=["POST"])
 def fileupload():
@@ -354,7 +364,7 @@ def fileupload():
                 points.append([point.latitude, point.longitude])
 
     with open(newname, "rb") as f:
-        supabase.storage.from_('gpxfiles').upload(newname, f)
+        supabase.storage.from_('gpxfiles').upload(f"/{user.user.id}/{newname}", f, {"content-type": "application/gpx+xml"})
 
     data, count = supabase.table('uploadedfiles').insert({"filename":newname, "pointsdata":points}).execute()
 

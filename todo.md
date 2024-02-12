@@ -14,4 +14,3 @@
 [] refactor code
 
 ## Backend
-[] each user uploads to their own folder
