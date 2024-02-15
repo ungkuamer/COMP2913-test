@@ -6,7 +6,7 @@ import os
 import json
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, EmailField, FileField
+from wtforms import StringField, PasswordField, EmailField, FileField, IntegerField
 from wtforms import SubmitField
 from wtforms.validators import InputRequired, Length, Email
 
@@ -19,6 +19,8 @@ import gpxpy
 import gpxpy.gpx
 
 from classes import User
+from payment import card_check
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -58,6 +60,11 @@ class UploadForm(BaseForm):
     file = FileField()
     submit = SubmitField("Upload")
 
+class PaymentForm(BaseForm):
+    name = StringField(validators=[InputRequired(), Length(min=3, max=50)])
+    card_number = IntegerField(validators=[InputRequired(), card_check.is_luhn_valid])
+    date = StringField(validators=[InputRequired(), Length(min=7, max=7), card_check.check_date])
+    cvv = IntegerField(validators=[InputRequired(), Length(min=3, max=4)])
 # Routes
 @app.route("/")
 def home():
@@ -233,45 +240,42 @@ This section handle routes regarding pricing and payments.
 
 @app.route("/pricing")
 def pricing():
-    return render_template("stripepricing.html")
+    return render_template("payment/pricing.html")
 
+@app.route("/checkout/<int:id>", methods=["POST", "GET"])
+def checkout(id):
+    form = PaymentForm()
+    user = supabase.auth.get_user()
+    
+    if user == None:
+        return redirect(url_for('login'))
 
-@app.route("/checkout", methods=['POST'])
-def checkout():
+    if id == 1:
+        price = 0.99
+        package = 'Weekly'
+        end = datetime.now() + timedelta(weeks=1)
+    elif id == 2:
+        price = 2.99
+        package = 'Monthly'
+        end = datetime.now() + timedelta(weeks=4)
+    else:
+        price = 29.99
+        package = 'Yearly'
+        end = datetime.now() + timedelta(weeks=52)
+
+    return render_template("payment/checkout.html", price=price, package=package, end=end.date(), form=form)
+
+@app.route("/api/payment", methods=["GET"])
+def payment():
     user = supabase.auth.get_user()
 
-    try:
-        prices = stripe.Price.list(
-            lookup_keys=[request.form['lookup_key']],
-            expand=['data.product']
-        )
+    if user == None:
+        return redirect(url_for('login'))
+    
+    return redirect(url_for('dashboard')) 
+    
 
-        checkout_session = stripe.checkout.Session.create(
-            line_items=[
-                {
-                    'price': prices.data[0].id,
-                    'quantity': 1,
-                },
-            ],
-            mode='subscription',
-            success_url='/success',
-            cancel_url='/home',
-        )
-        return redirect(checkout_session.url, code=303)
-    except Exception as e:
-        print(e)
-        return "Server error", 500
-
-@app.route("/create-portal-session", methods=['POST'])
-def customer_portal():
-    user = supabase.auth.get_user()
-    checkout_session = stripe.checkout.Session.retrieve(user.user.id)
-
-    portalSession = stripe.billing_portal.Session.create(
-        customer=checkout_session.customer,
-        return_url='/success',
-    )
-    return redirect(portalSession.url, code=303)
+    
 
 '''
 This section handle routes regarding file uploads.
