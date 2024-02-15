@@ -1,0 +1,72 @@
+{% extends "user_layout.html" %}
+{% block content %}
+<div class="flex-grow">
+    <script>
+        function sendJSON() {
+            var data = {
+                'total': '{{price}}',
+                'enddate': '{{end}}'
+            };
+
+            var xhr = new XMLHttpRequest();
+            var url = "/api/payment";
+
+            xhr.open("POST", url, true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    console.log(xhr.responseText);
+                }
+            };
+
+            xhr.send(JSON.stringify(data))
+        }
+    </script>
+    <div class="container flex flex-col items-center mx-auto py-10">
+        <h1 class="text-3xl font-bold text-black"> Checkout </h1>
+        <div class="flex flex-row gap-10">
+            <div>
+                <div class="py-5">
+                    <h2 class="font-semibold pt-2"> Payment Summary </h2>
+                    <p class="pt-2"> Subscription Type: </p>
+                    <p> {{package}} </p>
+                    <p class="pt-2"> End date: </p>
+                    <p>  {{end}} </p>
+                    <p class="pt-2"> Total Price: </p>
+                    <p> &pound;{{price}}</p>
+                </div>
+            </div>
+            <div>
+                <form method="POST" action="" class="pt-5">
+                    {{ form.hidden_tag() }}
+                    {{ form.csrf_token }}
+                    <fieldset class="font-semibold">
+                        <legend class="hidden">payment form</legend>
+                        <div class="flex flex-col p-2">
+                            {{ form.name.label(class="text-black")}}
+                            {{ form.name(class="border border-black border-2 px-1")}}
+                        </div>
+                        <div class="flex flex-col p-2">
+                            {{ form.card_number.label(class="text-black")}}
+                            {{ form.card_number(class="border border-black border-2 px-1")}}
+                        </div>
+                        <div class="flex flex-col p-2">
+                            {{ form.date.label(class="text-black")}}
+                            {{ form.date(class="border border-black border-2 px-1")}}
+                        </div>
+                        <div class="flex flex-col p-2">
+                            {{ form.cvv.label(class="text-black")}}
+                            {{ form.cvv(class="border border-black border-2 px-1")}}
+                        </div>
+                        <div>
+                            <button onclick="sendJSON()" type="button">Confirm</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

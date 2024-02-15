@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="flex-grow">
+    <div class="container flex flex-col items-center mx-auto py-10 max-w-5xl lg:max-w-4xl md:max-w-3xl sm:max-w-xl">
+        <h1 class="text-3xl font-bold"> Plans and Pricing </h1>
+        <div class="flex flex-row pt-10 gap-2">
+            <div class="border-4 border-black text-center">
+                <div class="pb-3">
+                    <h2 class="p-3 font-semibold text-xl"> Weekly Plan </h2>
+                    <p class="text-2xl"> &pound;0.99 </p>
+                    <p class="text-gray-600 pb-5"> per week </p>
+                    <a class="bg-black text-white px-3 py-2 font-semibold hover:italic hover:bg-slate-700" href="{{url_for('checkout', id=1)}}"> Subscribe </a>
+                </div>
+            </div>
+            <div class="border-4 border-black text-center">
+                <div class="pb-3">
+                    <h2 class="p-3 font-semibold text-xl"> Monthly Plan </h2>
+                    <p class="text-2xl"> &pound;2.99 </p>
+                    <p class="text-gray-600 pb-5"> per month </p>
+                    <a class="bg-black text-white px-3 py-2 font-semibold hover:italic hover:bg-slate-700" href="{{url_for('checkout', id=2)}}"> Subscribe </a>
+                </div>
+            </div>
+            <div class="border-4 border-black text-center">
+                <div class="pb-3">
+                    <h2 class="p-3 font-semibold text-xl"> Yearly Plan </h2>
+                    <p class="text-2xl"> &pound;29.99 </p>
+                    <p class="text-gray-600 pb-5"> per year </p>
+                    <a class="bg-black text-white px-3 py-2 font-semibold hover:italic hover:bg-slate-700" href="{{url_for('checkout', id=3)}}"> Subscribe </a>
+                </div>
+            </div>
+        </div>        
+    </div>
+</div>
+{% endblock content %}
