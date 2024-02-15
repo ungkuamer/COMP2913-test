@@ -11,7 +11,7 @@
 - [x] Allow owner display user data
     - [x] Display registered user
     - [x] Display uploaded files - on view create user page
-- [x] Accept payment - ON HOLD
+- [ ] Accept payment - ON HOLD
     - [ ] Add user metadata to payment
     - [ ] Change user 'isSubscribed' status
 - [ ] Allow owner display future revenue data - weekly level upto 1 year
