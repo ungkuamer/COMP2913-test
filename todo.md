@@ -1,8 +1,12 @@
 
 ## Features
-[] figure out how to attach metadata to stripe payment details
-    - custom form
-    - stripe payment link
+[] implement stripe payment
+    - create session
+    - add to payment table
+    - add to subscription table
+      - userid, startdate, enddate
+    - update user isSubscribe
+    
 
 ## Design
 [] change user/file table to pages if too long
@@ -13,4 +17,6 @@
 [] add docstring - IN PROGRESS
 [] refactor code
 
-## Backend
+## Payment
+[ ] check for user subscription on login
+[ ] if user is subscribe disable payment function - pull status from stripe api

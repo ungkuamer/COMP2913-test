@@ -1,0 +1,10 @@
+{% extends "user_layout.html" %}
+{% block content %}
+<script src="{{ url_for('static', filename='main.js') }}"></script>
+<div class="flex-grow">
+    <div class="container flex flex-col items-center mx-auto py-10 max-w-5xl lg:max-w-4xl md:max-w-3xl sm:max-w-xl">
+        <h1 class="text-3xl font-bold pb-5"> Test </h1>
+        <button class="border-2 border-black p-2" id="submitBtn">Purchase!</button>     
+    </div>
+</div>
+{% endblock content %}

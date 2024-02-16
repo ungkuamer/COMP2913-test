@@ -1,9 +1,8 @@
 
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, jsonify
 from supabase import create_client, Client
 import stripe
 import os
-import json
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, EmailField, FileField, IntegerField
@@ -274,8 +273,70 @@ def payment():
     
     return redirect(url_for('dashboard')) 
     
+@app.route("/test/payment")
+def test_payment():
+    user = supabase.auth.get_user()
 
+    if user == None:
+        return redirect(url_for("login"))
     
+    return render_template("payment/teststripe.html")
+
+@app.route("/config")
+def get_key():
+    stripe_config = {"publicKey": "pk_test_51OhYOQIcceGFCV5CbQ807r4tf6fLZTgcVZSCTg7OKdzl4VvFDcLiDAQB6lU8NcwhG87NIQaimTDClheq5qEwjiBk00wAur0ikT"}
+    return jsonify(stripe_config)
+
+@app.route("/create-checkout-session")
+def create_checkout_session():
+    user = supabase.auth.get_user()
+
+    if user == None:
+        return redirect(url_for("/login"))
+    
+    domain_url = "http://127.0.0.1:5000/"
+    stripe.api_key = "sk_test_51OhYOQIcceGFCV5CRc3mkHKKfsU7fb7sdwYEgV5AzQj20d0Prlv46al5m0ut00CjwLWOM1aGftSbf8r58xefVCN300gKuNNJI7"
+
+    data, count = supabase.table('stripecustomers').select('stripeid').eq('userid', user.user.id).execute()
+
+    if len(data[1]) == 0:
+        customer_id = None
+    else:
+        customer_id = data[1][0]['stripeid']
+
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            customer=customer_id,
+            success_url=domain_url+ "success?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url=domain_url,
+            customer_email=user.user.email,
+            client_reference_id=user.user.id,
+            payment_method_types=["card"],
+            mode="subscription",
+            line_items=[
+                {
+                    "price": "price_1OiJ7IIcceGFCV5CgsjvtPiB",
+                    "quantity": 1
+                }
+            ]
+        )
+        return jsonify({"sessionId":checkout_session["id"]})
+    except Exception as e:
+        return jsonify(error=str(e)), 403
+
+@app.route("/success")
+def success():
+    stripe.api_key = "sk_test_51OhYOQIcceGFCV5CRc3mkHKKfsU7fb7sdwYEgV5AzQj20d0Prlv46al5m0ut00CjwLWOM1aGftSbf8r58xefVCN300gKuNNJI7"
+    user = supabase.auth.get_user()
+    stripe_res = stripe.Customer.list(email=user.user.email)
+    data, count = supabase.table('stripecustomers').select('stripeid').eq('userid', user.user.id).execute()
+
+    if len(data[1]) == 0:
+        stripe_res = stripe.Customer.list(email=user.user.email)
+        to_add = stripe_res['data'][0]['id']
+        supabase.table('stripecustomers').insert({'stripeid':to_add}).execute()
+
+    return redirect(url_for("dashboard"))
 
 '''
 This section handle routes regarding file uploads.
@@ -312,15 +373,6 @@ def delete(id):
     supabase.storage.from_('gpxfiles').remove(f"{userid}/{filename}")
 
     return redirect(url_for('dashboard'))
-
-@app.route("/api/test/<id>")
-def test_delete(id):
-    if supabase.auth.get_user() == None:
-        return redirect(url_for('login'))
-    
-    data, count = supabase.table('uploadedfiles').select('filename', 'userid').eq('id', id).execute()
-
-    return str(data)
 
 @app.route("/api/upload", methods=["POST"])
 def fileupload():
@@ -400,11 +452,6 @@ def view(id):
         final_arr = item['pointsdata']
 
     return render_template('view.html', points=final_arr)
-
-
-@app.route("/success")
-def success():
-    return "Succeed!"
 
 if __name__ ==  "__main__":
     app.run(debug=True)
