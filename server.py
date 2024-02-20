@@ -105,18 +105,26 @@ def register():
 @app.route("/user/login", methods=['POST', 'GET'])
 def login():
     form = LoginForm()
+    stripe.api_key = "sk_test_51OhYOQIcceGFCV5CRc3mkHKKfsU7fb7sdwYEgV5AzQj20d0Prlv46al5m0ut00CjwLWOM1aGftSbf8r58xefVCN300gKuNNJI7"
 
     if form.validate_on_submit():
         data = supabase.auth.sign_in_with_password({"email":form.email.data, "password":form.password.data})
         user = supabase.auth.get_user()
 
         data, count = supabase.table('user').select('*').eq('id', user.user.id).execute()
-        
-
+        stripe_cust = supabase.table('stripecustomers').select('stripeid').eq('userid', user.user.id).execute()
+        '''
+        if len(stripe_cust[1][0]['stripeid']) != 0:
+            stripe_res = stripe.Subscription.list(customer=(data[1][0]['stripeid']))
+            stripe_res['data'][0]['id']
+        '''
         if len(data[1]) == 0 and user.user.user_metadata['admin'] == False:
             data, count = supabase.table('user').insert({"email": user.user.email,
                                                          "username":user.user.user_metadata["username"], 
                                                          "isSubscribed":user.user.user_metadata["isSubscribed"]}).execute()
+
+
+        
 
         if user.user.user_metadata['admin'] == True:
             return redirect(url_for('admin_dashboard'))
@@ -124,6 +132,16 @@ def login():
         return redirect(url_for('dashboard'))
     
     return render_template("user/login.html", form=form)
+
+@app.route("/test/login")
+def test_login():
+    stripe.api_key = "sk_test_51OhYOQIcceGFCV5CRc3mkHKKfsU7fb7sdwYEgV5AzQj20d0Prlv46al5m0ut00CjwLWOM1aGftSbf8r58xefVCN300gKuNNJI7"
+    try:
+        stripe_res = stripe.Subscription.list(customer="cus_PZhAPmTBIm6rXU")
+        pro_res = stripe_res['data'][0]['plan']['active']
+        return str(pro_res)
+    except stripe.InvalidRequestError:
+        pass
 
 @app.route("/user/dashboard")
 def dashboard():
@@ -413,7 +431,6 @@ def fileupload():
         for point in gpx.waypoints:
             points.append([point.latitude, point.longitude])
             
-    
     if len(points) == 0:
         for route in gpx.routes:
             for point in route.points:
